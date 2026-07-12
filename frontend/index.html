@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>园区智能巡检报告系统</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        /* ========== 全局 ========== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, "Microsoft YaHei", sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        
+        /* ========== 头部 ========== */
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-bottom: 1px solid #1e3a5f;
+            padding: 24px 32px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 24px;
+            color: #00b4d8;
+            letter-spacing: 2px;
+        }
+        .header p {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 6px;
+        }
+        .header .badge {
+            display: inline-block;
+            background: #00b4d8;
+            color: #0f172a;
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        /* ========== 主布局 ========== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+        }
+
+        /* ========== 卡片 ========== */
+        .card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #00b4d8;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #334155;
+        }
+
+        /* ========== 表单 ========== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-group label {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+        .form-group input, .form-group textarea {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: #e2e8f0;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: #00b4d8;
+        }
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: #00b4d8;
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 12px;
+        }
+        .btn:hover { background: #0098b8; transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary {
+            background: #334155;
+            color: #e2e8f0;
+            margin-left: 8px;
+        }
+        .btn-secondary:hover { background: #475569; }
+
+        /* ========== 报告 ========== */
+        .report-status {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+        }
+        .report-status .loading {
+            display: inline-block;
+            width: 32px; height: 32px;
+            border: 3px solid #334155;
+            border-top-color: #00b4d8;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 12px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .report-content { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .risk-high { background: #7f1d1d; color: #fca5a5; }
+        .risk-medium { background: #78350f; color: #fcd34d; }
+        .risk-low { background: #14532d; color: #86efac; }
+
+        .report-item {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+        .report-item .label {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+        .report-item .value {
+            font-size: 14px;
+            color: #e2e8f0;
+            line-height: 1.5;
+        }
+
+        /* ========== 历史列表 ========== */
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid #334155;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .history-item:hover { background: #0f172a; }
+        .history-item:last-child { border-bottom: none; }
+        .history-item .time { font-size: 11px; color: #64748b; }
+        .history-item .device { font-size: 13px; color: #e2e8f0; font-weight: bold; }
+        .history-item .risk-tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 8px;
+        }
+
+        /* ========== 空状态 ========== */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #475569;
+        }
+        .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-state p { font-size: 13px; }
+
+        /* ========== 底部提示 ========== */
+        .footer {
+            text-align: center;
+            padding: 16px;
+            color: #475569;
+            font-size: 12px;
+        }
+        .footer a { color: #00b4d8; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- 头部 -->
+    <div class="header">
+        <h1>🏭 园区智能巡检报告系统</h1>
+        <p>AI + RAG · 自动分析 · 智能报告</p>
+        <span class="badge">API 已连接</span>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="container">
+        <!-- 左栏：输入 -->
+        <div class="card">
+            <div class="card-title">📋 设备巡检数据</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>设备ID *</label>
+                    <input v-model="form.device_id" placeholder="如 PUMP-001">
+                </div>
+                <div class="form-group">
+                    <label>设备名称 *</label>
+                    <input v-model="form.device_name" placeholder="如 冷却水泵">
+                </div>
+                <div class="form-group">
+                    <label>温度 (°C)</label>
+                    <input v-model="form.temperature" type="number" placeholder="如 85">
+                </div>
+                <div class="form-group">
+                    <label>正常温度范围</label>
+                    <input v-model="form.normal_temp_range" placeholder="如 20-60°C">
+                </div>
+                <div class="form-group">
+                    <label>压力 (MPa)</label>
+                    <input v-model="form.pressure" type="number" step="0.1" placeholder="如 1.2">
+                </div>
+                <div class="form-group">
+                    <label>正常压力范围</label>
+                    <input v-model="form.normal_pressure_range" placeholder="如 0.3-0.8 MPa">
+                </div>
+                <div class="form-group">
+                    <label>振动 (mm/s)</label>
+                    <input v-model="form.vibration" type="number" step="0.1" placeholder="如 0.8">
+                </div>
+                <div class="form-group">
+                    <label>正常振动范围</label>
+                    <input v-model="form.normal_vibration_range" placeholder="如 0-0.5 mm/s">
+                </div>
+                <div class="form-group">
+                    <label>运行时长 (小时)</label>
+                    <input v-model="form.running_hours" type="number" placeholder="如 720">
+                </div>
+                <div class="form-group">
+                    <label>上次维护日期</label>
+                    <input v-model="form.last_maintenance" type="date">
+                </div>
+            </div>
+            <button class="btn" @click="generateReport" :disabled="loading">
+                {{ loading ? '⏳ 正在分析...' : '🤖 生成 AI 报告' }}
+            </button>
+            <button class="btn btn-secondary" @click="loadExample">
+                📝 加载示例
+            </button>
+        </div>
+
+        <!-- 右栏：结果 -->
+        <div class="card">
+            <div class="card-title">📊 AI 巡检报告</div>
+
+            <!-- 加载中 -->
+            <div v-if="loading" class="report-status">
+                <div class="loading"></div>
+                <p>正在调用大模型分析设备数据...<br>同时检索相似历史案例中...</p>
+            </div>
+
+            <!-- 报告内容 -->
+            <div v-else-if="report" class="report-content">
+                <div style="text-align:center; margin-bottom: 16px;">
+                    <span :class="'risk-badge ' + riskClass">{{ report.risk_level }}风险</span>
+                    <span style="margin-left:8px;font-size:12px;color:#64748b;">
+                        {{ form.device_id }} · {{ form.device_name }}
+                    </span>
+                </div>
+
+                <div class="report-item">
+                    <div class="label">🔍 问题分析</div>
+                    <div class="value">{{ report.issue_analysis }}</div>
+                </div>
+                <div class="report-item">
+                    <div class="label">🔧 维修建议</div>
+                    <div class="value">{{ report.repair_suggestion }}</div>
+                </div>
+                <div class="report-item">
+                    <div class="label">📝 巡检结论</div>
+                    <div class="value">{{ report.conclusion }}</div>
+                </div>
+                <div class="report-item">
+                    <div class="label">📅 建议下次巡检</div>
+                    <div class="value">{{ report.next_inspection }}</div>
+                </div>
+
+                <div style="font-size:11px;color:#475569;margin-top:12px;text-align:center;">
+                    ✅ RAG 检索增强已启用 · 参考了相似历史案例
+                </div>
+            </div>
+
+            <!-- 空状态 -->
+            <div v-else class="empty-state">
+                <div class="icon">🔧</div>
+                <p>在左侧输入设备数据，点击「生成 AI 报告」</p>
+                <p style="margin-top:4px;">或点击「加载示例」快速体验</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <div class="footer">
+        园区智能巡检报告生成系统 v1.0 · 基于通义千问 API + RAG 检索增强
+    </div>
+</div>
+
+<script>
+const { createApp, ref, reactive, computed } = Vue;
+
+createApp({
+    setup() {
+        const form = reactive({
+            device_id: '',
+            device_name: '',
+            temperature: '',
+            normal_temp_range: '',
+            pressure: '',
+            normal_pressure_range: '',
+            vibration: '',
+            normal_vibration_range: '',
+            running_hours: '',
+            last_maintenance: ''
+        });
+
+        const loading = ref(false);
+        const report = ref(null);
+
+        const riskClass = computed(() => {
+            if (!report.value) return '';
+            const level = report.value.risk_level || '';
+            if (level.includes('高')) return 'risk-high';
+            if (level.includes('中')) return 'risk-medium';
+            return 'risk-low';
+        });
+
+        function loadExample() {
+            form.device_id = 'PUMP-001';
+            form.device_name = '冷却水泵';
+            form.temperature = 85;
+            form.normal_temp_range = '20-60°C';
+            form.pressure = 1.2;
+            form.normal_pressure_range = '0.3-0.8 MPa';
+            form.vibration = 0.8;
+            form.normal_vibration_range = '0-0.5 mm/s';
+            form.running_hours = 720;
+            form.last_maintenance = '2025-06-01';
+            report.value = null;
+        }
+
+        async function generateReport() {
+            if (!form.device_id || !form.device_name) {
+                alert('请填写设备ID和设备名称');
+                return;
+            }
+
+            loading.value = true;
+            report.value = null;
+
+            const payload = {
+                device_id: form.device_id,
+                device_name: form.device_name
+            };
+            if (form.temperature) payload.temperature = Number(form.temperature);
+            if (form.normal_temp_range) payload.normal_temp_range = form.normal_temp_range;
+            if (form.pressure) payload.pressure = Number(form.pressure);
+            if (form.normal_pressure_range) payload.normal_pressure_range = form.normal_pressure_range;
+            if (form.vibration) payload.vibration = Number(form.vibration);
+            if (form.normal_vibration_range) payload.normal_vibration_range = form.normal_vibration_range;
+            if (form.running_hours) payload.running_hours = Number(form.running_hours);
+            if (form.last_maintenance) payload.last_maintenance = form.last_maintenance;
+
+            try {
+                const resp = await fetch('http://localhost:5000/api/report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await resp.json();
+                if (result.success) {
+                    report.value = result.report;
+                } else {
+                    alert('生成失败: ' + (result.error || '未知错误'));
+                }
+            } catch (e) {
+                alert('请求失败，请确认 API 服务是否运行: ' + e.message);
+            } finally {
+                loading.value = false;
+            }
+        }
+
+        return { form, loading, report, riskClass, loadExample, generateReport };
+    }
+}).mount('#app');
+</script>
+
+</body>
+</html>
