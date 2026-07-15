@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 WORKDIR /app
 COPY requirements.txt .
-RUN pip install openai python-dotenv flask flask-cors numpy
+RUN pip install openai python-dotenv flask flask-cors numpy fastapi uvicorn python-multipart langchain langchain-community langchain-openai langchain-core
 COPY . .
-CMD ["python", "app.py"]
+CMD ["python", "main.py"]
