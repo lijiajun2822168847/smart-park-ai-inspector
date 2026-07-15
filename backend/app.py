@@ -7,6 +7,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 from ai_engine import generate_report
+from langchain_engine import generate_report_with_langchain
 
 load_dotenv()
 
@@ -57,9 +58,14 @@ def create_report():
                 "error": f"缺少必填字段: {', '.join(missing)}"
             }), 400
 
-        # 调用 AI 引擎生成报告
+        # 调用 AI 引擎生成报告（支持切换 original / langchain）
+        engine = request.args.get("engine", "original")
         use_rag = request.args.get("rag", "true").lower() == "true"
-        report_text = generate_report(data, use_rag=use_rag)
+        
+        if engine == "langchain":
+            report_text = generate_report_with_langchain(data)
+        else:
+            report_text = generate_report(data, use_rag=use_rag)
 
         # 尝试解析 JSON
         try:
