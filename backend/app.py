@@ -89,7 +89,16 @@ def create_report():
             "error": f"生成报告失败: {str(e)}"
         }), 500
 
+@app.route("/api/analyze-pdf", methods=["POST"])
+def analyze_pdf():
+    """上传PDF并分析"""
+    if 'file' not in request.files:
+        return jsonify({"error": "请上传文件"}), 400
 
+    file = request.files['file']
+    text = file.read().decode('utf-8', errors='ignore')
+    result = analyze_pdf_text(text)
+    return jsonify({"success": True, "analysis": result})
 @app.route("/api/report/batch", methods=["POST"])
 def batch_report():
     """批量生成巡检报告"""

@@ -121,12 +121,47 @@
         }
         .btn:hover { background: #0098b8; transform: translateY(-1px); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* PDF上传 */
+        .upload-area {
+            border: 2px dashed #334155;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .upload-area:hover { border-color: #00b4d8; background: rgba(0,180,216,0.05); }
+        .upload-icon { font-size: 40px; margin-bottom: 8px; }
+        .file-info {
+            margin-top: 12px;
+            padding: 12px;
+            background: #0f172a;
+            border-radius: 8px;
+            text-align: center;
+        }
+
         .btn-secondary {
             background: #334155;
             color: #e2e8f0;
             margin-left: 8px;
         }
         .btn-secondary:hover { background: #475569; }
+        .tab-btn {
+            background: transparent;
+            color: #94a3b8;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 6px 16px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            background: #00b4d8;
+            color: #0f172a;
+            border-color: #00b4d8;
+            font-weight: bold;
+        }
 
         /* ========== 报告 ========== */
         .report-status {
@@ -227,7 +262,26 @@
         <!-- 左栏：输入 -->
         <div class="card">
             <div class="card-title">📋 设备巡检数据</div>
-            <div class="form-grid">
+            <div style="margin-bottom:12px;display:flex;gap:8px;">
+                <button class="tab-btn" :class="{active: tab === 'form'}" @click="tab='form'">📊 设备数据</button>
+                <button class="tab-btn" :class="{active: tab === 'pdf'}" @click="tab='pdf'">📄 上传PDF</button>
+            </div>
+            <!-- PDF上传 -->
+            <div v-if="tab === 'pdf'" class="pdf-upload">
+                <div class="upload-area" @click="$refs.fileInput.click()" @dragover.prevent @drop.prevent="handleDrop">
+                    <div class="upload-icon">📄</div>
+                    <p>点击或拖拽上传PDF文件</p>
+                    <p style="font-size:12px;color:#64748b;margin-top:4px;">支持 .pdf 格式</p>
+                </div>
+                <input ref="fileInput" type="file" accept=".pdf,.txt" @change="handleFile" style="display:none">
+                <div v-if="pdfFileName" class="file-info">
+                    📎 已选择: {{ pdfFileName }}
+                    <button class="btn" @click="analyzePdf" :disabled="pdfLoading" style="margin-top:8px;width:100%;">
+                        {{ pdfLoading ? '⏳ 分析中...' : '🤖 AI 分析文档' }}
+                    </button>
+                </div>
+            </div>
+            <div v-if="tab === 'form'" class="form-grid">
                 <div class="form-group">
                     <label>设备ID *</label>
                     <input v-model="form.device_id" placeholder="如 PUMP-001">
@@ -354,6 +408,13 @@ createApp({
         const loading = ref(false);
         const report = ref(null);
 
+        // PDF上传
+        const tab = ref('form');
+        const pdfFile = ref(null);
+        const pdfFileName = ref('');
+        const pdfLoading = ref(false);
+        const pdfResult = ref(null);
+
         const riskClass = computed(() => {
             if (!report.value) return '';
             const level = report.value.risk_level || '';
@@ -374,6 +435,50 @@ createApp({
             form.running_hours = 720;
             form.last_maintenance = '2025-06-01';
             report.value = null;
+        }
+
+        function handleFile(e) {
+            const file = e.target.files[0];
+            if (file) {
+                pdfFile.value = file;
+                pdfFileName.value = file.name;
+                pdfResult.value = null;
+            }
+        }
+
+        function handleDrop(e) {
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                pdfFile.value = file;
+                pdfFileName.value = file.name;
+                pdfResult.value = null;
+            }
+        }
+
+        async function analyzePdf() {
+            if (!pdfFile.value) return;
+            pdfLoading.value = true;
+            pdfResult.value = null;
+
+            const formData = new FormData();
+            formData.append('file', pdfFile.value);
+
+            try {
+                const resp = await fetch('http://localhost:5000/api/analyze-pdf', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await resp.json();
+                if (result.success) {
+                    pdfResult.value = result.analysis;
+                } else {
+                    alert('分析失败: ' + (result.error || ''));
+                }
+            } catch(e) {
+                alert('请求失败: ' + e.message);
+            } finally {
+                pdfLoading.value = false;
+            }
         }
 
         async function generateReport() {
@@ -417,7 +522,7 @@ createApp({
             }
         }
 
-        return { form, loading, report, riskClass, loadExample, generateReport };
+        return { form, loading, report, riskClass, loadExample, generateReport, tab, pdfFileName, pdfLoading, pdfResult, handleFile, handleDrop, analyzePdf };
     }
 }).mount('#app');
 </script>
