@@ -10,6 +10,7 @@
   <img src="https://img.shields.io/github/license/lijiajun2822168847/smart-park-ai-inspector?style=flat-square" />
   <img src="https://img.shields.io/github/last-commit/lijiajun2822168847/smart-park-ai-inspector?style=flat-square" />
   <img src="https://img.shields.io/github/issues/lijiajun2822168847/smart-park-ai-inspector?style=flat-square" />
+  <img src="https://img.shields.io/github/actions/workflow/status/lijiajun2822168847/smart-park-ai-inspector/ci.yml?style=flat-square&label=CI" />
 </p>
 
 # 🏭 园区智能巡检报告生成系统
@@ -90,7 +91,7 @@ git clone https://github.com/lijiajun2822168847/smart-park-ai-inspector.git
 cd smart-park-ai-inspector
 
 # 安装依赖
-pip install openai python-dotenv flask flask-cors numpy
+pip install -r backend/requirements.txt
 ```
 
 ### 配置
@@ -127,6 +128,9 @@ curl -X POST http://localhost:5000/api/report \
 
 ```
 smart-park-ai-inspector/
+├── .github/
+│   └── workflows/
+│       └── ci.yml                # 🤖 GitHub Actions CI/CD
 ├── .env                          # API Key（不上传）
 ├── .gitignore                    # Git 忽略配置
 ├── docker-compose.yml            # Docker 部署
@@ -137,6 +141,8 @@ smart-park-ai-inspector/
 │   ├── app.py                    # Flask API 服务
 │   ├── ai_engine.py              # AI 报告生成核心
 │   ├── rag_engine.py             # RAG 检索引擎
+│   ├── requirements.txt          # Python 依赖
+│   ├── Dockerfile                # Docker 构建文件
 │   └── data/
 │       ├── history_reports/      # 8份历史巡检报告
 │       └── chroma_db/            # 向量数据库
@@ -154,7 +160,7 @@ smart-park-ai-inspector/
 - [x] Vue 3 前端界面
 - [x] Docker 容器化部署
 - [x] 系统架构图
-- [ ] GitHub CI/CD 自动化测试
+- [x] GitHub CI/CD 自动化测试
 - [ ] 更多设备类型支持
 - [ ] 移动端适配
 - [ ] 语音输入支持
@@ -170,6 +176,9 @@ smart-park-ai-inspector/
 ### 3. 流式输出（可选）
 支持 SSE 流式输出，前端打字机效果展示 AI 推理过程。
 
+### 4. CI/CD 自动化
+配置 GitHub Actions 自动化流水线：代码风格检查 → 模块导入验证 → Docker 构建测试 → 一键部署。
+
 ## 📝 简历亮点
 
 > **园区智能巡检报告生成系统** | 独立开发 · GitHub 开源  
@@ -177,7 +186,7 @@ smart-park-ai-inspector/
 > - 基于 RAG 架构构建园区智能巡检助手，输入设备数据，AI 自动生成异常分析报告与维护建议  
 > - 设计行业专属 System Prompt，结合历史数据检索增强（RAG），报告准确率90%+  
 > - 实现 RESTful API + Vue 3 前端，支持批量处理与实时展示  
-> - Docker 容器化部署，支持一键启动  
+> - Docker 容器化部署 + GitHub Actions CI/CD 自动化流水线  
 > - 项目地址：https://github.com/lijiajun2822168847/smart-park-ai-inspector
 
 ## 📄 许可证
