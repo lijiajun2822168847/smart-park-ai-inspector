@@ -12,26 +12,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-      - name: Install deps
-        run: |
-          pip install flake8
-          pip install -r requirements.txt
-      - name: Run flake8
-        run: |
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -44,18 +24,12 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
-      - name: Install deps
+      - name: Install
         run: pip install -r requirements.txt
-      - name: Test imports
-        run: |
-          python -c "
-import sys
-sys.path.insert(0, '.')
-import ai_engine; print('OK: ai_engine')
-import rag_engine; print('OK: rag_engine')
-from flask import Flask; print('OK: flask')
-import numpy; print('OK: numpy')
-"
+      - name: Import check
+        run: python -c "import sys; sys.path.insert(0,'.'); import ai_engine; import rag_engine; from flask import Flask; import numpy; print('All imports OK')"
+      - name: Lint
+        run: pip install flake8 && flake8 . --count --select=E9,F63,F7,F82 --statistics
 
   docker:
     name: Docker
