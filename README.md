@@ -1,14 +1,25 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/AI-RAG-blue?style=for-the-badge&logo=openai" />
-  <img src="https://img.shields.io/badge/Python-3.9+-green?style=for-the-badge&logo=python" />
-  <img src="https://img.shields.io/badge/Vue-3-4fc08d?style=for-the-badge&logo=vue.js" />
-  <img src="https://img.shields.io/badge/Flask-2.0+-black?style=for-the-badge&logo=flask" />
+  <img src="https://img.shields.io/badge/AI-RAG-6366f1?style=for-the-badge&logo=openai" />
+  <img src="https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/Vue-3-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white" />
+  <img src="https://img.shields.io/badge/Flask-2.0-000000?style=for-the-badge&logo=flask" />
+  <img src="https://img.shields.io/badge/ChromaDB-7C3AED?style=for-the-badge&logo=databricks" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+  <br>
+  <img src="https://img.shields.io/github/stars/lijiajun2822168847/smart-park-ai-inspector?style=flat-square&label=Stars" />
+  <img src="https://img.shields.io/github/license/lijiajun2822168847/smart-park-ai-inspector?style=flat-square" />
+  <img src="https://img.shields.io/github/last-commit/lijiajun2822168847/smart-park-ai-inspector?style=flat-square" />
+  <img src="https://img.shields.io/github/issues/lijiajun2822168847/smart-park-ai-inspector?style=flat-square" />
 </p>
 
 # 🏭 园区智能巡检报告生成系统
 
 > 基于 **RAG（检索增强生成）** + **通义千问大模型** 的智能巡检助手  
 > 输入设备数据 → AI 自动分析 → 生成巡检报告 → 给出维修建议
+
+<p align="center">
+  <a href="docs/architecture.html"><strong>📊 查看系统架构图 →</strong></a>
+</p>
 
 ---
 
@@ -61,6 +72,8 @@
                     │  8份历史案例   │
                     └──────────────┘
 ```
+
+> 📊 [查看完整暗色主题架构图 →](docs/architecture.html) （浏览器打开，支持交互式查看）
 
 ## 🚀 快速开始
 
@@ -116,6 +129,10 @@ curl -X POST http://localhost:5000/api/report \
 smart-park-ai-inspector/
 ├── .env                          # API Key（不上传）
 ├── .gitignore                    # Git 忽略配置
+├── docker-compose.yml            # Docker 部署
+├── .dockerignore                 # Docker 忽略配置
+├── docs/
+│   └── architecture.html         # 📊 系统架构图
 ├── backend/
 │   ├── app.py                    # Flask API 服务
 │   ├── ai_engine.py              # AI 报告生成核心
@@ -125,6 +142,7 @@ smart-park-ai-inspector/
 │       └── chroma_db/            # 向量数据库
 ├── frontend/
 │   └── index.html                # Vue 3 前端界面
+├── screenshot.png
 └── README.md
 ```
 
@@ -134,6 +152,8 @@ smart-park-ai-inspector/
 - [x] RAG 检索增强生成
 - [x] Flask API 服务
 - [x] Vue 3 前端界面
+- [x] Docker 容器化部署
+- [x] 系统架构图
 - [ ] GitHub CI/CD 自动化测试
 - [ ] 更多设备类型支持
 - [ ] 移动端适配
@@ -152,11 +172,12 @@ smart-park-ai-inspector/
 
 ## 📝 简历亮点
 
-> **园区智能巡检报告生成系统** | 独立开发  
+> **园区智能巡检报告生成系统** | 独立开发 · GitHub 开源  
 > *技术栈：Python + LangChain + 通义千问API + Chroma向量库 + Vue 3*  
 > - 基于 RAG 架构构建园区智能巡检助手，输入设备数据，AI 自动生成异常分析报告与维护建议  
 > - 设计行业专属 System Prompt，结合历史数据检索增强（RAG），报告准确率90%+  
 > - 实现 RESTful API + Vue 3 前端，支持批量处理与实时展示  
+> - Docker 容器化部署，支持一键启动  
 > - 项目地址：https://github.com/lijiajun2822168847/smart-park-ai-inspector
 
 ## 📄 许可证

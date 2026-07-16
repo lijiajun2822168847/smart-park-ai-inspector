@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Park AI Inspector — 系统架构图</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'JetBrains Mono', monospace; background: #020617; min-height: 100vh; padding: 2rem; color: white; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    .header { margin-bottom: 2rem; }
+    .header-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+    .pulse-dot { width: 12px; height: 12px; background: #22d3ee; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    h1 { font-size: 1.5rem; font-weight: 700; }
+    .subtitle { color: #94a3b8; font-size: 0.875rem; margin-left: 1.75rem; }
+    .diagram-container { background: rgba(15,23,42,0.5); border-radius: 1rem; border: 1px solid #1e293b; padding: 1.5rem; overflow-x: auto; }
+    svg { width: 100%; min-width: 1000px; display: block; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 1rem; margin-top: 2rem; }
+    .card { background: rgba(15,23,42,0.5); border-radius: 0.75rem; border: 1px solid #1e293b; padding: 1.25rem; }
+    .card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .card-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .card-dot.cyan { background: #22d3ee; }
+    .card-dot.emerald { background: #34d399; }
+    .card-dot.violet { background: #a78bfa; }
+    .card h3 { font-size: 0.875rem; font-weight: 600; }
+    .card ul { list-style: none; color: #94a3b8; font-size: 0.75rem; }
+    .card li { margin-bottom: 0.375rem; }
+    .footer { text-align: center; margin-top: 1.5rem; color: #475569; font-size: 0.75rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-row">
+        <div class="pulse-dot"></div>
+        <h1>🏭 Smart Park AI Inspector — System Architecture</h1>
+      </div>
+      <p class="subtitle">RAG + 通义千问 · 园区智能巡检报告生成系统</p>
+    </div>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 1200 750">
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/></marker>
+          <marker id="arrow-cyan" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#22d3ee"/></marker>
+          <marker id="arrow-emerald" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#34d399"/></marker>
+          <marker id="arrow-violet" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a78bfa"/></marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/></pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#grid)"/>
+        <text x="30" y="40" fill="#22d3ee" font-size="11" font-weight="600">用户层</text>
+        <text x="360" y="40" fill="#22d3ee" font-size="11" font-weight="600">前端层</text>
+        <text x="680" y="40" fill="#22d3ee" font-size="11" font-weight="600">后端层</text>
+        <text x="950" y="40" fill="#22d3ee" font-size="11" font-weight="600">AI / 数据层</text>
+        <rect x="30" y="80" width="140" height="70" rx="8" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="100" y="105" fill="white" font-size="11" font-weight="600" text-anchor="middle">🌐 浏览器</text>
+        <text x="100" y="125" fill="#94a3b8" font-size="8" text-anchor="middle">Chrome / Edge</text>
+        <text x="100" y="138" fill="#94a3b8" font-size="8" text-anchor="middle">用户操作界面</text>
+        <rect x="30" y="200" width="140" height="70" rx="8" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="100" y="225" fill="white" font-size="11" font-weight="600" text-anchor="middle">🔌 API 客户端</text>
+        <text x="100" y="245" fill="#94a3b8" font-size="8" text-anchor="middle">curl / Postman</text>
+        <text x="100" y="258" fill="#94a3b8" font-size="8" text-anchor="middle">批量导入</text>
+        <rect x="360" y="80" width="200" height="90" rx="10" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="2"/>
+        <text x="460" y="108" fill="white" font-size="12" font-weight="700" text-anchor="middle">Vue 3 前端 SPA</text>
+        <text x="460" y="128" fill="#94a3b8" font-size="9" text-anchor="middle">index.html（CDN 加载）</text>
+        <text x="460" y="145" fill="#94a3b8" font-size="9" text-anchor="middle">暗色主题 · 响应式布局</text>
+        <text x="460" y="162" fill="#22d3ee" font-size="8" text-anchor="middle">http://localhost:5000</text>
+        <rect x="650" y="80" width="200" height="90" rx="10" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="2"/>
+        <text x="750" y="108" fill="white" font-size="12" font-weight="700" text-anchor="middle">Flask API 服务</text>
+        <text x="750" y="128" fill="#94a3b8" font-size="9" text-anchor="middle">app.py :5000</text>
+        <text x="750" y="145" fill="#94a3b8" font-size="9" text-anchor="middle">RESTful 接口</text>
+        <text x="750" y="162" fill="#34d399" font-size="8" text-anchor="middle">/api/report · /api/health</text>
+        <rect x="650" y="220" width="200" height="70" rx="8" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="750" y="245" fill="white" font-size="11" font-weight="600" text-anchor="middle">📚 RAG 检索引擎</text>
+        <text x="750" y="262" fill="#94a3b8" font-size="8" text-anchor="middle">rag_engine.py</text>
+        <text x="750" y="275" fill="#94a3b8" font-size="8" text-anchor="middle">余弦相似度检索</text>
+        <rect x="650" y="340" width="200" height="60" rx="8" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="750" y="365" fill="white" font-size="11" font-weight="600" text-anchor="middle">🧠 Prompt 工程</text>
+        <text x="750" y="382" fill="#94a3b8" font-size="8" text-anchor="middle">System Prompt + JSON 约束</text>
+        <text x="750" y="390" fill="#94a3b8" font-size="8" text-anchor="middle">temperature=0.3</text>
+        <rect x="920" y="80" width="220" height="80" rx="10" fill="rgba(120,53,15,0.3)" stroke="#fbbf24" stroke-width="2"/>
+        <text x="1030" y="108" fill="white" font-size="12" font-weight="700" text-anchor="middle">🤖 通义千问 LLM</text>
+        <text x="1030" y="128" fill="#94a3b8" font-size="9" text-anchor="middle">qwen-turbo</text>
+        <text x="1030" y="145" fill="#fbbf24" font-size="8" text-anchor="middle">API: dashscope.aliyuncs.com</text>
+        <rect x="920" y="210" width="220" height="60" rx="8" fill="rgba(120,53,15,0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="1030" y="235" fill="white" font-size="11" font-weight="600" text-anchor="middle">🔢 Embedding 模型</text>
+        <text x="1030" y="255" fill="#94a3b8" font-size="8" text-anchor="middle">text-embedding-v3 · 1024维</text>
+        <rect x="920" y="320" width="220" height="70" rx="8" fill="rgba(76,29,149,0.4)" stroke="#a78bfa" stroke-width="2"/>
+        <text x="1030" y="345" fill="white" font-size="11" font-weight="600" text-anchor="middle">📊 Chroma 向量数据库</text>
+        <text x="1030" y="365" fill="#94a3b8" font-size="8" text-anchor="middle">8 份历史巡检报告</text>
+        <text x="1030" y="378" fill="#a78bfa" font-size="8" text-anchor="middle">余弦距离 · 持久化存储</text>
+        <rect x="920" y="440" width="220" height="60" rx="8" fill="rgba(76,29,149,0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="1030" y="465" fill="white" font-size="11" font-weight="600" text-anchor="middle">📁 历史案例库</text>
+        <text x="1030" y="483" fill="#94a3b8" font-size="8" text-anchor="middle">data/history_reports/</text>
+        <rect x="900" y="55" width="270" height="470" rx="12" fill="rgba(251,191,36,0.04)" stroke="#fbbf24" stroke-width="1" stroke-dasharray="8,4"/>
+        <text x="910" y="73" fill="#fbbf24" font-size="9" font-weight="600">通义千问 API（云端）</text>
+        <rect x="30" y="420" width="200" height="60" rx="8" fill="rgba(120,53,15,0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="130" y="445" fill="white" font-size="11" font-weight="600" text-anchor="middle">🐳 Docker 部署</text>
+        <text x="130" y="463" fill="#94a3b8" font-size="8" text-anchor="middle">docker-compose.yml</text>
+        <path d="M 170 115 L 260 115 Q 290 115 290 125 L 290 125 Q 290 135 320 135 L 358 135" fill="none" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#arrow-cyan)"/>
+        <text x="290" y="108" fill="#94a3b8" font-size="8" text-anchor="middle">HTTP</text>
+        <path d="M 170 235 L 260 235 Q 290 235 290 200 L 290 165 Q 290 145 320 145 L 648 145" fill="none" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#arrow-cyan)"/>
+        <text x="400" y="175" fill="#94a3b8" font-size="8" text-anchor="middle">POST /api/report</text>
+        <line x1="560" y1="125" x2="648" y2="125" stroke="#34d399" stroke-width="2" marker-end="url(#arrow-emerald)"/>
+        <text x="604" y="118" fill="#94a3b8" font-size="8" text-anchor="middle">fetch API</text>
+        <line x1="750" y1="170" x2="750" y2="218" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrow-emerald)"/>
+        <text x="762" y="198" fill="#94a3b8" font-size="8">检索相似案例</text>
+        <line x1="850" y1="255" x2="918" y2="355" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arrow-violet)"/>
+        <text x="870" y="285" fill="#94a3b8" font-size="8">向量相似度检索</text>
+        <path d="M 850 240 L 890 240 Q 900 240 900 230 L 900 160 Q 900 140 918 140" fill="none" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <text x="870" y="205" fill="#94a3b8" font-size="8">上下文注入</text>
+        <line x1="1030" y1="270" x2="1030" y2="318" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arrow-violet)"/>
+        <text x="1042" y="298" fill="#94a3b8" font-size="8">存储向量</text>
+        <line x1="1030" y1="438" x2="1030" y2="392" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arrow-violet)"/>
+        <text x="1042" y="420" fill="#94a3b8" font-size="8">加载历史报告</text>
+        <path d="M 850 140 L 890 140 Q 910 140 910 150 L 910 155 Q 910 165 930 165 L 940 165 Q 950 165 950 140 L 918 140" fill="none" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <text x="890" y="128" fill="#94a3b8" font-size="8">调用 LLM 生成报告</text>
+        <line x1="750" y1="290" x2="750" y2="338" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrow-emerald)"/>
+        <text x="762" y="318" fill="#94a3b8" font-size="8">组装 Prompt</text>
+        <path d="M 230 450 L 300 450 Q 320 450 330 430 L 358 130" fill="none" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow)"/>
+        <path d="M 230 450 L 320 450 Q 350 450 360 430 L 380 200 Q 400 180 450 175 L 648 130" fill="none" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4,4"/>
+        <text x="280" y="440" fill="#fbbf24" font-size="8">Docker 容器化</text>
+        <rect x="900" y="540" width="260" height="140" rx="8" fill="rgba(15,23,42,0.6)" stroke="#1e293b" stroke-width="1"/>
+        <text x="915" y="558" fill="white" font-size="10" font-weight="600">图例</text>
+        <rect x="915" y="568" width="14" height="8" rx="2" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1"/><text x="935" y="575" fill="#94a3b8" font-size="8">用户 / 前端</text>
+        <rect x="915" y="582" width="14" height="8" rx="2" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1"/><text x="935" y="589" fill="#94a3b8" font-size="8">后端服务</text>
+        <rect x="915" y="596" width="14" height="8" rx="2" fill="rgba(120,53,15,0.3)" stroke="#fbbf24" stroke-width="1"/><text x="935" y="603" fill="#94a3b8" font-size="8">云端 API / 部署</text>
+        <rect x="915" y="610" width="14" height="8" rx="2" fill="rgba(76,29,149,0.4)" stroke="#a78bfa" stroke-width="1"/><text x="935" y="617" fill="#94a3b8" font-size="8">数据存储</text>
+        <line x1="915" y1="632" x2="929" y2="632" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/><text x="935" y="635" fill="#94a3b8" font-size="8">数据流向</text>
+        <line x1="915" y1="648" x2="929" y2="648" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4,4"/><text x="935" y="651" fill="#94a3b8" font-size="8">部署边界</text>
+      </svg>
+    </div>
+    <div class="cards">
+      <div class="card"><div class="card-header"><div class="card-dot cyan"></div><h3>前端展示</h3></div><ul><li>• 设备数据录入表单</li><li>• AI 报告实时展示</li><li>• 风险等级可视化</li><li>• 暗色主题现代化 UI</li></ul></div>
+      <div class="card"><div class="card-header"><div class="card-dot emerald"></div><h3>AI 引擎</h3></div><ul><li>• 通义千问 qwen-turbo</li><li>• RAG 检索增强生成</li><li>• 行业 System Prompt</li><li>• JSON 结构化输出</li></ul></div>
+      <div class="card"><div class="card-header"><div class="card-dot violet"></div><h3>数据存储</h3></div><ul><li>• Chroma 向量数据库</li><li>• 8 份历史巡检报告</li><li>• text-embedding-v3</li><li>• 余弦相似度检索</li></ul></div>
+    </div>
+    <p class="footer">Smart Park AI Inspector · RAG + 通义千问 · 开源 MIT License</p>
+  </div>
+</body>
+</html>
